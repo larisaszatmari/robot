@@ -1,0 +1,160 @@
+#include <NewPing.h>
+
+
+
+#define TRIGGER_PIN_dr  12  // Arduino pin tied to trigger pin on the ultrasonic sensor.
+#define ECHO_PIN_dr     11  // Arduino pin tied to echo pin on the ultrasonic sensor.
+#define MAX_DISTANCE_dr 10 // Maximum distance we want to ping for (in centimeters). Maximum sensor distance is rated at 400-500cm.
+
+#define TRIGGER_PIN_f  7  // Arduino pin tied to trigger pin on the ultrasonic sensor.
+#define ECHO_PIN_f     8  // Arduino pin tied to echo pin on the ultrasonic sensor.
+#define MAX_DISTANCE_f 10 // Maximum distance we want to ping for (in centimeters). Maximum sensor distance is rated at 400-500cm.
+
+#define TRIGGER_PIN_st  5  // Arduino pin tied to trigger pin on the ultrasonic sensor.
+#define ECHO_PIN_st     6  // Arduino pin tied to echo pin on the ultrasonic sensor.
+#define MAX_DISTANCE_st 10 // Maximum distance we want to ping for (in centimeters). Maximum sensor distance is rated at 400-500cm.
+
+NewPing sonar_dr(TRIGGER_PIN_dr, ECHO_PIN_dr, MAX_DISTANCE_dr); // NewPing setup of pins and maximum distance.
+NewPing sonar_st(TRIGGER_PIN_st, ECHO_PIN_st, MAX_DISTANCE_st); // NewPing setup of pins and maximum distance.
+NewPing sonar_f(TRIGGER_PIN_f, ECHO_PIN_f, MAX_DISTANCE_f); // NewPing setup of pins and maximum distance.
+int IN1=2;
+int IN2=3;
+int IN3=4;
+int IN4=5;
+void setup() 
+{
+  Serial.begin(115200); // Open serial monitor at 115200 baud to see ping results.
+  pinMode(IN1,OUTPUT);
+  pinMode(IN2,OUTPUT);
+  pinMode(IN3,OUTPUT);
+  pinMode(IN4,OUTPUT);
+}
+
+
+void loop() 
+{ int a[4];
+  int minim;
+  int i;
+  for(i=0;i<4;i++)
+  a[i]=0;
+  delay(10);                     // Wait 50ms between pings (about 20 pings/sec). 29ms should be the shortest delay between pings.
+  Serial.print("Ping_dr: ");
+  Serial.print(sonar_dr.ping_cm()); // Send ping, get distance in cm and print result (0 = outside set distance range)
+  Serial.println("cm");
+  
+
+  delay(10);                     // Wait 50ms between pings (about 20 pings/sec). 29ms should be the shortest delay between pings.
+  Serial.print("Ping_st: ");
+  Serial.print(sonar_st.ping_cm()); // Send ping, get distance in cm and print result (0 = outside set distance range)
+  Serial.println("cm");
+  delay(10);                     // Wait 50ms between pings (about 20 pings/sec). 29ms should be the shortest delay between pings.
+  Serial.print("Ping_st: ");
+  Serial.print(sonar_f.ping_cm()); // Send ping, get distance in cm and print result (0 = outside set distance range)
+  Serial.println("cm");
+ minim=sonar_st.ping_cm();
+ if(minim>sonar_dr.ping_cm() )
+ {  
+    if( sonar_dr.ping_cm()<sonar_f.ping_cm())
+    {
+    //verific daca ultimi 3 pasi nu au fost tot dreapta
+  
+    if(a[0]!=3 && a[1]!=3 && a[2]!=3)
+     { //mergi la dreapta 
+      
+     }
+      else
+     { //mergi la urmatoarea cea mai mare distanta
+     if(sonar_st.ping_cm()<sonar_f.ping_cm() )
+    {
+    digitalWrite(IN1,LOW);
+     digitalWrite(IN2,LOW);
+     delay(30);
+     
+      digitalWrite(IN3,LOW);
+     digitalWrite(IN4,HIGH);
+    
+    }
+    else 
+    {
+      //mergi in dreapta 
+    }
+    }
+   a[0]=a[1];
+   a[1]=a[2];
+   a[2]=a[3];
+    }
+    else
+    if( sonar_dr.ping_cm()>sonar_f.ping_cm())
+    {
+      //verific daca ultimi 3 pasi nu au fost tot fata
+  
+    if(a[0]!=3 && a[1]!=3 && a[2]!=3)
+     { //mergi in fata
+      
+     }
+      else
+     { //mergi la urmatoarea cea mai mare distanta
+     if(sonar_st.ping_cm()<sonar_dr.ping_cm() )
+    {
+      //mergi in stanga 
+    }
+    else 
+    {
+      //mergi in dreapta 
+    }
+    }
+    a[0]=a[1];
+    a[1]=a[2];
+    a[2]=a[3];
+    }
+    }
+    
+    
+ else
+{ if(sonar_st.ping_cm()<sonar_f.ping_cm() )
+  {
+  //verific daca ultimi 3 pasi nu au fost tot st
+  
+    if(a[0]!=3 && a[1]!=3 && a[2]!=3)
+     { //mergi in stanga
+      
+     }
+      else
+     { //mergi la urmatoarea cea mai mare distanta
+     if(sonar_f.ping_cm()<sonar_dr.ping_cm() )
+    {
+      //mergi in fata 
+    }
+    else 
+    {
+      //mergi in dreapta 
+    }
+    }
+    a[0]=a[1];
+    a[1]=a[2];
+    a[2]=a[3];
+  }
+  else
+  { //verific daca ultimi 3 pasi nu au fost tot dr
+  
+    if(a[0]!=3 && a[1]!=3 && a[2]!=3)
+     { //mergi in dr
+      
+     }
+      else
+     { //mergi la urmatoarea cea mai mare distanta
+     if(sonar_f.ping_cm()<sonar_st.ping_cm() )
+    {
+      //mergi in fata 
+    }
+    else 
+    {
+      //mergi in stanga 
+    }
+    }
+    a[0]=a[1];
+    a[1]=a[2];
+    a[2]=a[3];
+    }
+  }
+}
